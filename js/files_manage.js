@@ -239,6 +239,15 @@ function load_new_label(){
 function onkeydowns(){
     if(event.keyCode ==13){
         load_new_label();
+    }else if(event.keyCode ==27){
+        createDirs(database.db_get_id_by_name(db_path,curr_label));
+    }
+}
+
+function change_to_text(){
+    if(event.keyCode ==13){
+        var content_div = document.getElementById("raw_text");
+        content_div.focus();
     }
 }
 

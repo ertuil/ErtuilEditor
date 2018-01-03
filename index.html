@@ -3,12 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <title>Ertuil的笔记本</title>
-    <script srcA="node_modules/jquery/dist/jquery.min.js"></script>
-    <script srcA="js/line_number.js"></script>
     <script src="js/files_manage.js"></script>
     <script src="js/text_work.js"></script>
-    <script srcA="bootstrap/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="main.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   </head>
@@ -48,7 +45,7 @@
       </div>
     </div>
     <div id = "note_text" class = "note_texts">
-           <input type="text" id="raw_title" placeholder="标题" onmousemove="info(12)" onmouseout="info(0)" autofocus>
+           <input type="text" id="raw_title" placeholder="标题" onmousemove="info(12)" onmouseout="info(0)" onkeydown="change_to_text()"autofocus>
            <textarea id = "raw_text" wrap="virtual"  onkeyup="text_counts()" ></textarea>
            <script src="js/tab_control.js"></script>
     </div>
