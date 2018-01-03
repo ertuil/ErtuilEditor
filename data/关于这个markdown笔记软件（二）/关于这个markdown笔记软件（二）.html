@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+ <html>
+ <head><meta charset="utf-8"/><meta name="Application Author" content="Ertuil" /> 
+<script type="text/x-mathjax-config"> MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});</script><script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> 
+<link href="/Users/ertuil/workspace/noteApp/css/vs.css" rel="stylesheet"> 
+<link href="/Users/ertuil/workspace/noteApp/css/css1.css" rel="stylesheet"> 
+<script src="/Users/ertuil/workspace/noteApp/js/highlight.pack.js"></script> 
+<script>hljs.initHighlightingOnLoad();</script>
+</head>
+<body>
+<h1 id="-markdown-">关于这个markdown笔记软件（二）——模型层设计</h1>
+<h2 id="-">数据库选择</h2>
+<p>之前也说过我们使用的是lowdb作为数据库处理，这个node.js非常小巧，只管理一个json文件。这对于一个小项目来说，是最合适不过的了。</p>
+<h2 id="-">安装</h2>
+<p>命令:</p>
+<pre><code class="lang-bash">npm install lowdb --save
+</code></pre>
+<h2 id="-">基本使用方法：</h2>
+<p>有关数据库对函数定义在./js/database.js文件中。
+引入包：</p>
+<pre><code class="lang-javascript">var low = require(&#39;lowdb&#39;);
+const FileSync = require(&#39;lowdb/adapters/FileSync&#39;)
+</code></pre>
+<p>链接数据库需要两部：</p>
+<pre><code class="lang-javascript">const adapter = new FileSync(db_path);
+var db = low(adapter);
+</code></pre>
+<p>具体使用方法：</p>
+<p><a href="https://www.npmjs.com/package/lowdb">npm网</a></p>
+<h2 id="-">建立模型</h2>
+<p>目前的模型非常简单，在database中只有三个表：label，notes，info。</p>
+<ul>
+<li>label：记录了标签名，拥有两个field，id、label_name</li>
+<li>notes：具体记录了所有笔记，三个field，id、label_name、note_name</li>
+<li>info：记录了标签和笔记的数量，label_num,note_num</li>
+</ul>
+<p>下面代码给出了数据库初始化（只执行一次）：</p>
+<pre><code class="lang-javascript">const adapter = new FileSync(db_path);
+var db = low(adapter);
+db.defaults({ label:[],notes:[],info:{} }).write();
+db.get(&#39;label&#39;).push({id: 1,label_name :&#39;default&#39;}).write();
+db.set(&#39;info.note_num&#39;,0).write();
+db.set(&#39;info.label_num&#39;,1).write();
+</code></pre>
+<p>可以看到，对label表插入了默认标签，‘default’。</p>
+<h2 id="-">封装</h2>
+<p>database.js通过对外暴露以下函数，提供服务：</p>
+<pre><code class="lang-node">exports.db_get_node_number = db_get_node_number;
+exports.db_change_label = db_change_label;
+exports.db_init = db_init;
+exports.db_insert_note = db_insert_note;
+exports.db_get_labels = db_get_labels;
+exports.db_get_notes_by_label = db_get_notes_by_label;
+exports.db_get_note_by_name = db_get_note_by_name;
+exports.db_get_id_by_name = db_get_id_by_name;
+exports.db_change_node_name = db_change_node_name;
+exports.db_remove_node = db_remove_node;
+exports.db_insert_label = db_insert_label;
+exports.db_remove_label = db_remove_label;
+</code></pre>
+<p>选择几个具体的函数给出代码：</p>
+<pre><code class="lang-javascript">function db_insert_note(db_path,name,label){
+    const adapter = new FileSync(db_path);
+    var db = low(adapter);
+    if(db.get(&#39;notes&#39;).find({ note_name: name }).size().value() &gt;=1 ){
+        db.get(&#39;notes&#39;).find({ note_name: name }).assign({label_name : label}).write();
+    }else{
+        var id = db.get(&#39;info.note_num&#39;).value() + 1;
+        db.get(&#39;notes&#39;).push({id: id,note_name : name ,label_name : label}).write();
+        db.set(&#39;info.note_num&#39;,id).write();
+    }
+}
+</code></pre>
+<p>插入笔记，如果重名且label不一致，就修改label。</p>
+<pre><code class="lang-javascript">function db_change_node_name(db_path,old_name,new_name){
+    const adapter = new FileSync(db_path);
+    var db = low(adapter);
+    db.get(&#39;notes&#39;).find({note_name:old_name}).assign({note_name:new_name}).write();
+}
+</code></pre>
+<p>修改note的名字属性。</p>
+<p>还有其他函数不再一一列举。</p>
+<h2 id="-">其他文件</h2>
+<ul>
+<li>数据库文件和其他文本文件全部放在项目的./data/文件夹下。其中每一个笔记都创建一个同名文件夹，存放.md和通过markdown解析生成的.html文件。</li>
+<li>如果有图片和其他文件，插入markdown时，会自动拷贝一份图片，并放在笔记同名文件夹下。引用复制的文件。</li>
+<li>如果要导出为pdf文件，则在通过用户选择保存位置，不再单独存放pdf文件。</li>
+</ul>
+</div></body></html>
+

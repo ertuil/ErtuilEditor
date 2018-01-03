@@ -1,0 +1,23 @@
+{
+  "label": [
+    {
+      "id": 1,
+      "label_name": "default"
+    },
+    {
+      "id": 2,
+      "label_name": "关于这个软件"
+    }
+  ],
+  "notes": [
+    {
+      "id": 3,
+      "note_name": "关于这个markdown笔记软件（二）",
+      "label_name": "关于这个软件"
+    }
+  ],
+  "info": {
+    "note_num": 40,
+    "label_num": 3
+  }
+}
