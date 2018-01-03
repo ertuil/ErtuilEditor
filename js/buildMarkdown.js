@@ -4,39 +4,40 @@ var path = require('path');
 const BrowserWindow = require('electron').remote.BrowserWindow;
 var marked = require('marked')
 
-function file_save(path){
+// function file_save(path){
+    // var title = document.getElementById('raw_title').value;
+    // var content = document.getElementById('raw_text').value;
+    // if(title == ''){
+        // return;
+    // }
+    // file_path = path+"/data/"+title+'/';
+    // createFolder(file_path+title+".md");
+    // fs.writeFileSync(file_path+title+".md", content);
+// }
+
+function file_save(path,value = "css1.css",convert = false){
     var title = document.getElementById('raw_title').value;
     var content = document.getElementById('raw_text').value;
     if(title == ''){
         return;
     }
-    // database.db_insert_note(db_path,title,'default');
     file_path = path+"/data/"+title+'/';
     createFolder(file_path+title+".md");
     fs.writeFileSync(file_path+title+".md", content);
-}
 
-function convert_mk(path,value = "css1.css"){
-    var preword = "<!DOCTYPE html>\n\r \
-<html>\n\r \
-<head><meta charset=\"utf-8\"/><meta name=\"Application Author\" content=\"Ertuil\" /> \n\r\
-<script type=\"text/x-mathjax-config\"> MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\\\(','\\\\)']]}});</script><script type=\"text/javascript\" src=\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML\"></script> \n\r\
-<link href=\""+path+"/css/vs.css\" rel=\"stylesheet\"> \n\r\
-<link href=\""+path+"/css/"+value+"\" rel=\"stylesheet\"> \n\r\
-<script src=\""+path+"/js/highlight.pack.js\"></script> \n\r\
-<script>hljs.initHighlightingOnLoad();</script>\n\r\
-</head>\n\r<body>\n\r"
+    if(convert == true){
+        var preword = "<!DOCTYPE html>\n\r \
+    <html>\n\r \
+    <head><meta charset=\"utf-8\"/><meta name=\"Application Author\" content=\"Ertuil\" /> \n\r\
+    <script type=\"text/x-mathjax-config\"> MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\\\(','\\\\)']]}});</script><script type=\"text/javascript\" src=\"http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML\"></script> \n\r\
+    <link href=\""+path+"/css/vs.css\" rel=\"stylesheet\"> \n\r\
+    <link href=\""+path+"/css/"+value+"\" rel=\"stylesheet\"> \n\r\
+    <script src=\""+path+"/js/highlight.pack.js\"></script> \n\r\
+    <script>hljs.initHighlightingOnLoad();</script>\n\r\
+    </head>\n\r<body>\n\r"
+    
+    var lastword = "</div></body></html>\n\r";
 
-var lastword = "</div></body></html>\n\r";
-    var title = document.getElementById('raw_title').value;
-    var content = document.getElementById('raw_text').value;
-    if(title == ''){
-        return;
-    }
-    // database.db_insert_note(db_path,title,'default');
-    file_path = path+"/data/"+title+'/';
-    createFolder(file_path+title+".md");
-    fs.writeFileSync(file_path+title+".md", content);
     var rendererMD = new marked.Renderer();
     marked.setOptions({
         renderer: rendererMD,
@@ -60,6 +61,7 @@ var lastword = "</div></body></html>\n\r";
         });
         ipcRenderer.send('open-view',title);
     });
+    }
 };
 
 
@@ -77,4 +79,4 @@ var createFolder = function(to) {
 };
 
 exports.file_save = file_save;
-exports.convert_mk = convert_mk;
+// exports.convert_mk = convert_mk;

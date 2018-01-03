@@ -24,17 +24,14 @@ ipcRenderer.on('info_insert',function(){
     import_file()});
 ipcRenderer.on('info_remove',function(){delete_note()});
 ipcRenderer.on('info_remove_label',function(){delete_label()});
-ipcRenderer.on('info_show',function(){save_note(false,true);});
+ipcRenderer.on('info_show',function(){build_mk()});
 ipcRenderer.on('info_save',function(){save_note()});
 ipcRenderer.on('info_out',function(){make_pdf()});
-
-
-
 
 function removeAllChild(node_id)  
 {  
     var div = document.getElementById(node_id);  
-    while(div.hasChildNodes())
+    while(div.hasChildNodes()) //当div下还存在子节点时 循环继续  
     {  
         div.removeChild(div.firstChild);  
     }  
@@ -66,9 +63,6 @@ function isDir(path){
 }  
 
 function createDirs(sel_id,node_id = ''){
-    // if(save_note(false,false,false) == 1){
-    //     return;
-    // }
     removeAllChild("labels");
     removeAllChild("notes");
     var flag = false;
@@ -88,8 +82,11 @@ function createDirs(sel_id,node_id = ''){
         button.setAttribute("onclick", "createDirs("+labels[idx].id+")");
         label_div.appendChild(button);
     }
+
     document.getElementById('labels').appendChild(label_div);
+
     var notes = database.db_get_notes_by_label(db_path,sel_label);
+
     var ul = document.createElement('ul');
     ul.className = "list-unstyled";
     var ul_title = document.createElement('li');
@@ -156,27 +153,16 @@ function create_new(){
     createDirs(database.db_get_id_by_name(db_path,curr_label),curr_note);
 }
 
-function save_note(auto = false,build = false,reload = true){
-    if(auto == true && document.activeElement.id=="raw_title"){
-        return 0;//自动保存时，如果没有获得完整标题名，则这次不保存。
-    }
-    var title_div = document.getElementById("raw_title");
-    var title = '';
-    if(title_div) title = title_div.value;
-    var info = document.getElementById('text_info');
-    info.innerHTML = "正在保存!";
+function save_note(){
+    var title = document.getElementById("raw_title").value;
     if(title != curr_note && database.db_get_note_by_name(db_path,title).length > 0){
         dialog.showErrorBox("文件名重复","请重新命名！");
         document.getElementById("raw_title").value = curr_note;
-        info.innerHTML = "";
-        return 1;//文件名重复
+        return 1;
     }
     if(!title||title == ''){
-        if(!document.getElementById("raw_title").value == ''){
-            dialog.showErrorBox('无法保存！','未指定文件名。');
-        }
-        info.innerHTML = "";
-        return 2;//没有得到标题名。
+        dialog.showErrorBox('无法保存！','未指定文件名。');
+        return 2;
     }
     if(curr_note != title){
         if(curr_note == ''){
@@ -188,20 +174,38 @@ function save_note(auto = false,build = false,reload = true){
             }
         }
     }
-    if(build == true){
-        var styles = document.getElementById("styles").value;
-        buildMarkdown.file_save(__dirname,styles,true);
-    }else{
-        buildMarkdown.file_save(__dirname);
-    }
+    buildMarkdown.file_save(__dirname);
     curr_note = title;
-    if(reload) createDirs(database.db_get_id_by_name(db_path,curr_label),title);
-    setTimeout(function() {
-        info.innerHTML = "";
-    }, 1000);
+    createDirs(database.db_get_id_by_name(db_path,curr_label),title);
     return 3;
 }
 
+function build_mk(){
+    var title = document.getElementById("raw_title").value;
+    if( title != curr_note && database.db_get_note_by_name(db_path,title).length > 0){
+        dialog.showErrorBox("文件名重复","请重新命名！");
+        document.getElementById("raw_title").value = curr_note;
+        return ;
+    }
+    if(!title||title == ''){
+        dialog.showErrorBox('无法保存！','未指定文件名。');
+        return;
+    }
+    if(curr_note != title){
+        if(curr_note == ''){
+            database.db_insert_note(db_path,title,curr_label);
+        }else{
+            database.db_change_node_name(db_path,curr_note,title);
+            if(fs.existsSync(__dirname+"/data/"+curr_note)){
+                removeDir(__dirname+"/data/"+curr_note)
+            }
+        }
+    }
+    var styles = document.getElementById("styles").value;
+    buildMarkdown.convert_mk(__dirname,styles);
+    curr_note = title;
+    createDirs(database.db_get_id_by_name(db_path,curr_label),title);
+}
 
 function new_label(){
     var text_area = document.createElement("div");
@@ -341,7 +345,41 @@ function insertAtCursor(myField, myValue){
 }
 
 
-// function auto_save()
+function auto_save(){
+    if(document.activeElement.id=="raw_title"){
+        return ;
+    }
+    var info = document.getElementById('text_info');
+    info.innerHTML = "自动保存!";
+    var title = document.getElementById("raw_title").value;
+    if(title != curr_note && database.db_get_note_by_name(db_path,title).length > 0){
+        dialog.showErrorBox("文件名重复","请重新命名！");
+        document.getElementById("raw_title").value = curr_note;
+        return ;
+    }
+    if(!title||title == ''){
+        setTimeout(function() {
+            info.innerHTML = "";
+        }, 1000);
+        return;
+    }
+    if(curr_note != title){
+        if(curr_note == ''){
+            database.db_insert_note(db_path,title,curr_label);
+        }else{
+            database.db_change_node_name(db_path,curr_note,title);
+            if(fs.existsSync(__dirname+"/data/"+curr_note)){
+                removeDir(__dirname+"/data/"+curr_note)
+            }
+        }
+    }
+    buildMarkdown.file_save(__dirname);
+    curr_note = title;
+    createDirs(database.db_get_id_by_name(db_path,curr_label),title);
+    setTimeout(function() {
+        info.innerHTML = "";
+    }, 1000);
+}
 
 function make_pdf(){
     var title = document.getElementById("raw_title").value;
@@ -354,7 +392,7 @@ function make_pdf(){
     readStream.pipe(writeStream);
     var info = document.getElementById('text_info');
     info.innerHTML = "正在导出";
-    save_note(false,true);
+    build_mk();
     const options = {
         title: '导出',
         filters: [
@@ -364,22 +402,23 @@ function make_pdf(){
       dialog.showSaveDialog(options, function (filename) {
         phantom.create().then(function(ph) {
             ph.createPage().then(function(page) {
-                page.open("file://"+__dirname+'/data/output.html').then(function(status) {
-                    page.property('viewportSize',{width: 800, height: 600});
-                    page.render(filename).then(function(){
-                        info.innerHTML = "";
-                        ph.exit();
-                    });
-                });
+             page.open("file://"+__dirname+'/data/output.html').then(function(status) {
+              page.property('viewportSize',{width: 800, height: 600});
+              page.render(filename).then(function(){
+                info.innerHTML = "";
+               ph.exit();
+              });
+             });
             });
         });
     });
 }
 
 
+
 var rule     = new schedule.RecurrenceRule();  
-var times    = [1,11,21,31,41,51];  
+var times    = [1,21,31,41,51];  
 rule.second  = times;  
 schedule.scheduleJob(rule, function(){  
-    save_note(true,false);
+    auto_save();
 });  
