@@ -1,6 +1,6 @@
 {
   "name": "note",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "A small editer",
   "main": "main.js",
   "dependencies": {
@@ -20,10 +20,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron main.js",
-    "packager": "electron-packager . ErtuilEditer --all --out ./OutApp --version 0.0.4 --overwrite --icon=./ertuil.icns",
-    "packageDarwin": "electron-packager . ErtuilEditer --platform=darwin --arch=x64 --icon=./ertuil.icns --out=./OutApp  --app-version=0.0.4  --overwrite",
-    "packageLinux": "electron-packager . ErtuilEditer --platform=linux --arch=x64 --icon=./ertuil.icns --out=./OutApp  --app-version=0.0.4  --overwrite",
-    "packageWindow": "electron-packager . ErtuilEditer --platform=win32 --arch=x64 --icon=./ertuil.icns --out=./OutApp  --app-version=0.0.4  --overwrite "
+    "packager": "electron-packager . ErtuilEditer --all --out ./OutApp --version 0.0.5 --overwrite --icon=./ertuil.icns",
+    "packageDarwin": "electron-packager . ErtuilEditer --platform=darwin --arch=x64 --icon=./ertuil.icns --out=./OutApp  --app-version=0.0.5  --overwrite",
+    "packageLinux": "electron-packager . ErtuilEditer --platform=linux --arch=x64 --icon=./ertuil.icns --out=./OutApp  --app-version=0.0.5  --overwrite",
+    "packageWindow": "electron-packager . ErtuilEditer --platform=win32 --arch=x64 --icon=./ertuil.icns --out=./OutApp  --app-version=0.0.5  --overwrite "
   },
   "author": "Ertuil",
   "license": "ISC"
