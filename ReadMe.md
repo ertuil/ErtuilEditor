@@ -1,5 +1,5 @@
 
-![图标](ertuil.icns)
+![图标](ertuileditor.png)
 
 # 这是一个笔记软件
 
