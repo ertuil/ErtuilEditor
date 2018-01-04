@@ -3,14 +3,30 @@
   <head>
     <meta charset="UTF-8">
     <title>Ertuil的笔记本</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <script src="js/files_manage.js"></script>
     <script src="js/text_work.js"></script>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="main.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   </head>
 
   <body>
+    <div id = 'loading'> 
+      <div >
+        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+        <h3>Ertuil的笔记本</h3>
+        <p>Loading……</p>
+      </div>
+    </div>
+    <script>
+      function loadings(){
+        document.getElementById('loading').style.display="none";
+      }
+      window.onload = function(){
+        setTimeout(loadings,1000);
+      }
+    </script>
+
     <div id = "note_menu" class = "note_menus btn-toolbar row" rool="toolbar">
         <div class="btn-group btn-group-sm ">
                 <button type="button" class="btn btn-success" onclick="create_new()" onmousemove="info(1)" onmouseout="info(0)">新建笔记</button>
@@ -29,7 +45,7 @@
         </select>
         
         <div class="btn-group btn-group-sm" style="position:fixed;right:0">
-                <button type="button" class="btn btn-primary" onclick="make_pdf()" onmousemove="info(13)" onmouseout="info(0)">导出</button>
+                <button type="button" class="btn btn-primary" onclick="output_file()" onmousemove="info(13)" onmouseout="info(0)">导出</button>
                 <button type="button" class="btn btn-info" onclick="import_file()" onmousemove="info(7)" onmouseout="info(0)">插入</button>
                 <button type="button" class="btn btn-default" onclick="save_note()" onmousemove="info(8)" onmouseout="info(0)">保存</button>
                 <button type="button" class="btn btn-success" onclick="save_note(false,true)" onmousemove="info(9)" onmouseout="info(0)">生成</button>

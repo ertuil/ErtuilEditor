@@ -34,6 +34,7 @@ app.on('ready', function() {
       viewWindow  = null;
     }
     viewWindow = new BrowserWindow({ width: 800, height: 600 })
+    viewWindow.setTitle(arg);
     viewWindow.loadURL('file://' + __dirname + '/data/'+arg+'/'+arg+'.html');
     viewWindow.on('closed', function() {
     viewWindow = null;
@@ -74,6 +75,14 @@ let template = [{
     }
   },{
     type: 'separator'
+  },{
+    label: '导入',
+    accelerator: 'CmdOrCtrl+O',
+    click:function(){
+      if(mainWindow){
+        mainWindow.webContents.send('info_open');
+      }
+    }
   },{
     label: '保存',
     accelerator: 'CmdOrCtrl+S',

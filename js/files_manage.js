@@ -1,4 +1,5 @@
 
+
 var fs = require('fs');
 var path = require('path');
 var database = require(__dirname+'/js/database');
@@ -26,7 +27,8 @@ ipcRenderer.on('info_remove',function(){delete_note()});
 ipcRenderer.on('info_remove_label',function(){delete_label()});
 ipcRenderer.on('info_show',function(){save_note(false,true);});
 ipcRenderer.on('info_save',function(){save_note()});
-ipcRenderer.on('info_out',function(){make_pdf()});
+ipcRenderer.on('info_out',function(){output_file()});
+ipcRenderer.on('info_open',function(){input_file()});
 
 
 
@@ -107,7 +109,6 @@ function createDirs(sel_id,node_id = ''){
             h3.classList.add('btn-success');
             flag = true;
         }else{
-
             h3.classList.add('btn-default');
         }
         h3.setAttribute("onclick","load_file('"+notes[idx].note_name+"')");
@@ -290,6 +291,7 @@ function delete_note(){
     var label_id = database.db_get_id_by_name(db_path,curr_label);
     var note = database.db_get_notes_by_label(db_path,curr_label)[0];
     if(note) {
+        createDirs(label_id);
         createDirs(label_id,database.db_get_notes_by_label(db_path,curr_label)[0].note_name);
     }else{
         createDirs(label_id);
@@ -351,40 +353,86 @@ function insertAtCursor(myField, myValue){
 
 
 // function auto_save()
-
-function make_pdf(){
+function output_file(){
     var title = document.getElementById("raw_title").value;
     if(!title||title == ''){
         dialog.showErrorBox('无法保存！','未指定文件名。');
         return;
     }
-    var readStream = fs.createReadStream(__dirname+'/data/'+curr_note+'/'+curr_note+'.html');
-    var writeStream = fs.createWriteStream(__dirname+'/data/output.html');
-    readStream.pipe(writeStream);
     var info = document.getElementById('text_info');
     info.innerHTML = "正在导出";
     save_note(false,true);
     const options = {
         title: '导出',
         filters: [
-          { name: 'PDF', extensions: ['pdf'] }
+          { name: 'PDF文稿', extensions: ['pdf'] },
+          { name: '图片格式', extensions: ['jpg','jpeg','png','gif'] },
+          { name: 'Markdown文件', extensions: ['md'] }
         ]
-      }
-      dialog.showSaveDialog(options, function (filename) {
-        phantom.create().then(function(ph) {
-            ph.createPage().then(function(page) {
-                page.open("file://"+__dirname+'/data/output.html').then(function(status) {
-                    page.property('viewportSize',{width: 800, height: 600});
-                    page.render(filename).then(function(){
-                        info.innerHTML = "";
-                        ph.exit();
-                    });
+    }
+    dialog.showSaveDialog(options, function (filename) {
+        console.log(path.extname(filename));
+        if(path.extname(filename) == '.md'){
+            var readStream = fs.createReadStream(__dirname+'/data/'+curr_note+'/'+curr_note+'.md');
+            var writeStream = fs.createWriteStream(filename);
+            console.log(__dirname+'/data/'+curr_note+'/'+curr_note+'.md');
+            console.log(filename);
+            readStream.pipe(writeStream);
+        }else{
+            make_file(filename);
+        }
+    })
+    info.innerHTML = '';
+}
+
+function make_file(filename){
+    var readStream = fs.createReadStream(__dirname+'/data/'+curr_note+'/'+curr_note+'.html');
+    var writeStream = fs.createWriteStream(__dirname+'/data/output.html');
+    readStream.pipe(writeStream);
+    phantom.create().then(function(ph) {
+        ph.createPage().then(function(page) {
+            page.open("file://"+__dirname+'/data/output.html').then(function(status) {
+                page.property('viewportSize',{width: 800, height: 600});
+                page.render(filename).then(function(){
+                    ph.exit();
                 });
             });
         });
     });
 }
 
+function input_file(){
+    createDirs(database.db_get_id_by_name(db_path,curr_label));
+    dialog.showOpenDialog({
+        properties: ['openFile']
+      }, function (files) {
+        if(path.extname(files[0]) != '.md'){
+            dialog.showErrorBox('不是markdown文件','请确认文件后缀是.md');
+            return ;
+        }
+        var base_name = path.basename(files[0],'.md');
+        if(database.db_get_note_by_name(db_path,base_name).length > 0){
+            dialog.showErrorBox('文件名重复','请修改文件名');
+            return
+        }
+
+        database.db_insert_note(db_path,base_name,curr_label);
+        var to = __dirname+'/data/'+base_name+'/'+base_name+'.md';
+        var sep = path.sep;
+        var folders = path.dirname(to).split(sep);
+        var p = '';
+        while (folders.length) {
+            p += folders.shift() + sep;
+            if (!fs.existsSync(p)) {
+                fs.mkdirSync(p);
+            }
+        }
+        var readStream = fs.createReadStream(files[0]);
+        var writeStream = fs.createWriteStream(to);
+        readStream.pipe(writeStream);
+        createDirs(database.db_get_id_by_name(db_path,curr_label),base_name);
+    })
+}
 
 var rule     = new schedule.RecurrenceRule();  
 var times    = [1,11,21,31,41,51];  
