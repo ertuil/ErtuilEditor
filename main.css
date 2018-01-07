@@ -1,0 +1,74 @@
+#loading{
+    position:absolute; 
+    left:0px; 
+    top:0px;
+    width:100%;
+    height:100%; 
+    background-color:#FFFFFF; 
+    z-index:1000;
+    text-align: center;
+}
+
+bodys {
+    margin: 10 auto;
+    width: 100%;
+    height: 100%;
+    overflow-y:visible;
+}
+.note_menus{
+    float: top;
+    width: 100%;
+    background-color:#FFF8F8;
+    border-style: solid;
+    border-width: 0px 0px 0.2px 0px;
+    border-color: #ECEFF2;
+}
+.note_filters{
+    width: 25%;
+    height: 700px;
+    margin: 10;
+    float: left;
+    background-color: #FAFAFA;
+    border-style: solid;
+    border-width: 0px 0.1px 0px 0px;
+    border-color: #ECEFF2;
+    overflow-y:scroll; 
+}
+.note_texts{
+    float: right;
+    width:75%;
+    height: 700px;
+    text-align:center;
+    background-color:white;
+}
+
+.note_downs{
+    clear:left;
+    background-color:#FFF8F8;
+    border-style: solid;
+    border-width: 0.2px 0px 0px 0px;
+    border-color: #ECEFF2;
+}
+
+#raw_text{
+    height: 670px;
+    width:100%;
+    outline: none;
+    border-width: 0 0 0 0;
+}
+#raw_title{
+    height: 30px;
+    width:100%;
+    outline: none;
+    border-width: 0px 0px 0.1px 0px;
+}
+#selector{
+    height: 25px;
+    width: 100px;
+    vertical-align: -webkit-baseline-middle;
+}
+#styles{
+    height: 25px;
+    width: 100px;
+    vertical-align: -webkit-baseline-middle;
+}

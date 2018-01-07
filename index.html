@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Ertuil的笔记本</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/files_manage.js"></script>
+    <script src="js/text_work.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  </head>
+
+  <body>
+    <div id = 'loading'> 
+      <div >
+        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+        <h3>Ertuil的笔记本</h3>
+        <p>Loading……</p>
+      </div>
+    </div>
+    <script>
+      function loadings(){
+        document.getElementById('loading').style.display="none";
+      }
+      window.onload = function(){
+        setTimeout(loadings,1000);
+      }
+    </script>
+
+    <div id = "note_menu" class = "note_menus btn-toolbar row" rool="toolbar">
+        <div class="btn-group btn-group-sm ">
+                <button type="button" class="btn btn-success" onclick="create_new()" onmousemove="info(1)" onmouseout="info(0)">新建笔记</button>
+                <button type="button" class="btn btn-default" onclick="new_label()" onmousemove="info(2)" onmouseout="info(0)">新建标签</button>
+                <button type="button" class="btn btn-danger" onclick="delete_note()" onmousemove="info(3)" onmouseout="info(0)">删除笔记</button>
+                <button type="button" class="btn btn-warning" onclick="delete_label()" onmousemove="info(4)" onmouseout="info(0)">删除标签</button>
+        </div>
+        <select id = "selector" style="position:relative;left:30px" onmousemove="info(5)" onmouseout="info(0)">
+        </select>
+        <script>
+          create_menu();
+        </script>
+        <select id = "styles" style="position:relative;left:60px" onmousemove="info(6)" onmouseout="info(0)">
+            <option value ="css1.css">样式1</option>
+            <option value ="css2.css">样式2</option>
+        </select>
+        
+        <div class="btn-group btn-group-sm" style="position:fixed;right:0">
+                <button type="button" class="btn btn-primary" onclick="output_file()" onmousemove="info(13)" onmouseout="info(0)">导出</button>
+                <button type="button" class="btn btn-info" onclick="import_file()" onmousemove="info(7)" onmouseout="info(0)">插入</button>
+                <button type="button" class="btn btn-default" onclick="save_note()" onmousemove="info(8)" onmouseout="info(0)">保存</button>
+                <button type="button" class="btn btn-success" onclick="save_note(false,true)" onmousemove="info(9)" onmouseout="info(0)">生成</button>
+        </div>
+    </div>
+    <div id = "note_filter" class = "note_filters">
+        <h3><span class="glyphicon glyphicon-bookmark"></span>标签</h3>
+      <div id = "labels" onmousemove="info(10)" onmouseout="info(0)">
+          
+      </div>
+      <div id = "notes" onmousemove="info(11)" onmouseout="info(0)">
+
+      </div>
+    </div>
+    <div id = "note_text" class = "note_texts">
+           <input type="text" id="raw_title" placeholder="标题" onmousemove="info(12)" onmouseout="info(0)" onkeydown="change_to_text()"autofocus>
+           <textarea id = "raw_text" wrap="virtual"  onkeyup="text_counts()" ></textarea>
+           <script src="js/tab_control.js"></script>
+    </div>
+    <div id = "note_down" class = "note_downs">
+           <p style="position:fixed;left:10px" id = "text_info"></p>  
+           <p style="position:fixed;right:10px" id = "text_count"></p>  
+           <script>
+        createDirs(1);
+           </script>
+    </div>
+  </body>
+</html>
